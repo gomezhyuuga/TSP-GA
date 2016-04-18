@@ -3,18 +3,30 @@ global POPULATION_N
 global POPULATION
 global CITIES_POSITION
 global STATS
-STATS = cell(POPULATION_N + 3, 5);
+global BEST_PATH
+global PLOT_TITLE
+global PLOT_SIZE
+global PATH_PLOT
 
-CITIES = 4;
-plotSize = 100;
-DISTANCE_M = [
-     0, 20, 42, 35;
-    20,  0, 30, 34;
-    42, 30,  0, 12;
-    35, 34, 12,  0];
+STATS = cell(POPULATION_N + 3, 5);
+CITIES = 10;
+
+PLOT_SIZE = 20
 POPULATION_N = 40;
 
-CITIES_POSITION = randi(plotSize, [CITIES, 2]);
+% Generate map position of cities and distances
+CITIES_POSITION = PLOT_SIZE * rand(2, CITIES);
+DISTANCE_M = zeros(CITIES);
+for i = 1 : CITIES - 1
+    position1 = CITIES_POSITION(:, i);
+    for j = i + 1 : CITIES
+        position2 = CITIES_POSITION(:, j);
+        dist = position1 - position2;
+        distSq = sqrt(dist' * dist);
+        DISTANCE_M(i, j) = distSq;
+        DISTANCE_M(j, i) = distSq;
+    end
+end
 
 % Generate initial POPULATION
 POPULATION = zeros(POPULATION_N, CITIES);
@@ -23,22 +35,39 @@ for i = 1 : POPULATION_N
 end
 
 % Random initial bestPath
-bestPath = POPULATION(randi(CITIES), :);
+BEST_PATH = POPULATION(randi(CITIES), :);
 POPULATION;
 
 plots();
 stats();
+global TABLE
 
-for i = 1 : 400
-    stats();
-    parents = reproduction();
-    POPULATION = mutation(crossover(reproduction()));
-end
 colTitles = {'Cromosoma', 'Distancia', 'f_x', 'P_Select', 'EC', 'AC'};
 colFormat = { 'char', 'numeric', 'numeric', 'numeric', 'numeric', 'numeric'};
-uitable(...
-    'Position', [0, 0, 500, 200],...
+
+TABLE = uitable(...
+    'Units', 'normalized',...
+    'Position', [0, 0, 1.0, 0.5],...
     'ColumnName', colTitles,...
     'ColumnFormat', colFormat,...
     'Data', STATS);
+
+for i = 1 : 20
+    stats();
+    parents = reproduction();
+    POPULATION = mutation(crossover(reproduction()));
+    BEST_PATH = findBest();
+    
+    % Avoid update plots several times
+    if mod(i, 3) == 0
+        pause(0.5);
+        set(PLOT_TITLE, 'string', {[ 'BEST PATH: ' num2str(BEST_PATH)];...
+             ['DISTANCE = ' num2str(distanceForPath(BEST_PATH))]});
+        set(TABLE, 'Data', STATS);
+        set(PATH_PLOT,...
+            'XData', [CITIES_POSITION(1, BEST_PATH) CITIES_POSITION(1, BEST_PATH(1))],...
+            'YData', [CITIES_POSITION(2, BEST_PATH) CITIES_POSITION(2, BEST_PATH(1))])
+    end
+end
+
 POPULATION
