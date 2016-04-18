@@ -7,12 +7,14 @@ global BEST_PATH
 global PLOT_TITLE
 global PLOT_SIZE
 global PATH_PLOT
+global TABLE
+
+CITIES       = 42;
+PLOT_SIZE    = 100;
+POPULATION_N = 100;
+GENERATIONS  = 3000;
 
 STATS = cell(POPULATION_N + 3, 5);
-CITIES = 10;
-
-PLOT_SIZE = 20
-POPULATION_N = 40;
 
 % Generate map position of cities and distances
 CITIES_POSITION = PLOT_SIZE * rand(2, CITIES);
@@ -40,9 +42,8 @@ POPULATION;
 
 plots();
 stats();
-global TABLE
 
-colTitles = {'Cromosoma', 'Distancia', 'f_x', 'P_Select', 'EC', 'AC'};
+colTitles = {'Cromosoma', 'Distancia', 'f(x)', 'P_Select', 'EC', 'AC'};
 colFormat = { 'char', 'numeric', 'numeric', 'numeric', 'numeric', 'numeric'};
 
 TABLE = uitable(...
@@ -50,24 +51,26 @@ TABLE = uitable(...
     'Position', [0, 0, 1.0, 0.5],...
     'ColumnName', colTitles,...
     'ColumnFormat', colFormat,...
+    'ColumnWidth', { 400 'auto' 'auto' 'auto' 'auto' 'auto' },...
     'Data', STATS);
 
-for i = 1 : 20
+for i = 1 : GENERATIONS
     stats();
     parents = reproduction();
     POPULATION = mutation(crossover(reproduction()));
+    
+    % Find best and remove the worst
     BEST_PATH = findBest();
     
     % Avoid update plots several times
-    if mod(i, 3) == 0
-        pause(0.5);
+    if mod(i, 50) == 0
+        pause(0.05);
         set(PLOT_TITLE, 'string', {[ 'BEST PATH: ' num2str(BEST_PATH)];...
-             ['DISTANCE = ' num2str(distanceForPath(BEST_PATH))]});
+             ['DISTANCE = ' num2str(distanceForPath(BEST_PATH))];...
+             ['GENERATION ' num2str(i)]});
         set(TABLE, 'Data', STATS);
         set(PATH_PLOT,...
             'XData', [CITIES_POSITION(1, BEST_PATH) CITIES_POSITION(1, BEST_PATH(1))],...
             'YData', [CITIES_POSITION(2, BEST_PATH) CITIES_POSITION(2, BEST_PATH(1))])
     end
 end
-
-POPULATION

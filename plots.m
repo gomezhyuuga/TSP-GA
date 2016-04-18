@@ -10,7 +10,7 @@ function plots( )
         
     figure('Name', 'CITIES',...
         'Units', 'normalized',...
-        'Position', [0 0 0.5 0.5]);
+        'Position', [0 0 0.7 0.7]);
 
     subplot(2,1,1);
     
@@ -19,15 +19,15 @@ function plots( )
         'bo',...
         'MarkerFaceColor', 'b');
     
-    axis equal;
-    xlim([-0.1*PLOT_SIZE 1.1*PLOT_SIZE]);
-    ylim([-0.1*PLOT_SIZE 1.1*PLOT_SIZE]);
+%     axis equal;
+%     xlim([-0.1*PLOT_SIZE 1.1*PLOT_SIZE]);
+%     ylim([-0.1*PLOT_SIZE 1.1*PLOT_SIZE]);
     
     t = {[ 'BEST PATH: ' num2str(BEST_PATH)];...
-             ['DISTANCE = ' num2str(distanceForPath(BEST_PATH))]};
+             ['DISTANCE = ' num2str(distanceForPath(BEST_PATH))];...
+             ['GENERATION ' num2str(1)]};
     PLOT_TITLE = title(t);
     hold on;
-    
     
     PATH_PLOT = plot(...
         [CITIES_POSITION(1, BEST_PATH) CITIES_POSITION(1, BEST_PATH(1))],...

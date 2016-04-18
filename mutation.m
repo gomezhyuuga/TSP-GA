@@ -1,6 +1,7 @@
 function population = mutation( children )
     %MUTATION Summary of this function goes here
     %   Detailed explanation goes here
+    global BEST_PATH
     
     p_mut1 = 0.065;
     p_mut2 = 0.024;
@@ -33,6 +34,8 @@ function population = mutation( children )
         end
     end
     
+    % USE ELITISM TO PRESERVE LAST BEST
+    children(randi(length(children)), :) = BEST_PATH;
     population = children;
 end
 
